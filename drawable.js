@@ -1,9 +1,6 @@
 import rough from 'roughjs'
 
 function Drawable () {
-  this.element = null
-  this.context2d = null
-  this.roughCanvas = null
   this.createAndAppend = function (parent) {
     this.element = document.createElement('canvas')
     parent.appendChild(this.element)
@@ -17,6 +14,10 @@ function Drawable () {
   this.clear = function () {
     this.context2d.clearRect(0, 0, this.element.width, this.element.height)
   }
+
+  this.element = null
+  this.context2d = null
+  this.roughCanvas = null
 }
 
 export default Drawable

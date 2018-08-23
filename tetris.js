@@ -88,8 +88,8 @@ function Tetris (options) {
     }
   }
 
-  this.piece_rotate_right = function () {
-    this.piece.rotate_r()
+  this.rotatePieceClockwise = function () {
+    this.piece.rotateClockwise()
     var tmpPos = [this.pos[0], this.pos[1]]
     if (this.piece.collide(this.ground, this.pos) || this.piece.outside(this.ground, this.pos)) {
       // test moving left
@@ -99,7 +99,7 @@ function Tetris (options) {
         tmpPos = [ this.pos[0] + 1, this.pos[1] ]
         if (this.piece.collide(this.ground, tmpPos) || this.piece.outside(this.ground, tmpPos)) {
         // un able to move , undo
-          this.piece.rotate_l()
+          this.piece.rotateCounterClockwise()
           return
         }
       }
@@ -110,8 +110,8 @@ function Tetris (options) {
     this.piece.draw(this.piece_ground, this.pos)
   }
 
-  this.piece_rotate_left = function () {
-    this.piece.rotate_l()
+  this.rotatePieceCounterClockwise = function () {
+    this.piece.rotateCounterClockwise()
     var tmpPos = [this.pos[0], this.pos[1]]
     if (this.piece.collide(this.ground, this.pos) || this.piece.outside(this.ground, this.pos)) {
       // test moving left
@@ -121,7 +121,7 @@ function Tetris (options) {
         tmpPos = [ this.pos[0] + 1, this.pos[1] ]
         if (this.piece.collide(this.ground, tmpPos) || this.piece.outside(this.ground, tmpPos)) {
         // un able to move , undo
-          this.piece.rotate_r()
+          this.piece.rotateClockwise()
           return
         }
       }
@@ -188,20 +188,21 @@ function Tetris (options) {
           break
       }
       if (l.length > 0) {
-        this.lines_removed(this, l)
+        this.linesRemovedCallback(this, l)
       }
       this.count.lines += l.length
       this.count.pieces += 1
-      this.new_piece(this, this.piece, this.next_piece, l)
+      this.newPieceCallback(this, this.piece, this.next_piece, l)
       this.ground.removeLines(l)
       if (this.ground.ended()) {
         this.ended = true
+        // when the game ends grey out all the pieces
         this.ground.mapGroundBlocks(function (x, y, b) {
-          b.set_color('#777777')
+          b.setColor('#777777')
         })
-        this.game_ended(this)
+        this.gameEndedCallback(this)
       }
-      // this.ground.meld();
+      // this.ground.meld()
 
       this.layer_dirt = true
     }
@@ -216,16 +217,10 @@ function Tetris (options) {
   }
 
   // Methods
-  this.resize = function (width, height) {
-    this.block_size = parseInt((height) / this.options.blocks_h)
+  this.resize = function () {
     this.block_size = 30
-    this.options.width = width
-    if (width == null) {
-      this.options.width = this.options.blocks_w * this.block_size
-    }
-    this.options.height = height
-    this.ground.set_block_size(this.block_size)
-    this.piece_ground.set_block_size(this.block_size)
+    this.ground.setBlockSize(this.block_size)
+    this.piece_ground.setBlockSize(this.block_size)
     this.layer_dirt = true
     this.piece_layer_dirt = true
   }
@@ -240,39 +235,28 @@ function Tetris (options) {
   }
 
   // punishments
-  this.hard_piece = function () {
+  this.makeNextPieceHardOne = function () {
     this.next_piece = new Piece(null, {
       hard: true
     })
   }
 
-  this.random_bottom = function () {
-    this.ground.add_random_bottom(Math.ceil(Math.random() * 4))
+  this.addRandomBottom = function (numberOfLines) {
+    if (numberOfLines === undefined) {
+      numberOfLines = Math.ceil(Math.random() * 4)
+    }
+    this.ground.addRandomBottom(numberOfLines)
+    this.layer_dirt = true
   }
 
-  this.shade_color = function () {
-    this.piece.color = '#050505'
-  }
-  this.mirror_y = function () {
-    var hh = 9999
-    this.ground.mapGroundBlocks(function (w, h, b) {
-      if (!b.empty && h < hh) {
-        hh = h
-      }
-    })
-    if (hh === 9999) { return }
-    this.ground.mirror_y(hh)
-    console.log(hh)
-  }
   // callbacks
-  this.lines_removed = function (tetris, lines) {
+  this.linesRemovedCallback = function (tetris, lines) {
   }
 
-  this.game_ended = function (tetris) {
+  this.gameEndedCallback = function (tetris) {
   }
 
-  this.new_piece = function (tetris, current_piece, next_piece, lines) {
-  // callback
+  this.newPieceCallback = function (tetris, currentPiece, nextPiece, lines) {
   }
 }
 

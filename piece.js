@@ -1,271 +1,267 @@
 import {FisherYatesShuffle} from './helpers'
 
+var PiecesShapes = {}
+
+PiecesShapes['is'] = {
+  color: '#64b0ff',
+  shapes: [
+    [
+      [1, 1, 0],
+      [0, 1, 1],
+      [0, 0, 0]
+    ],
+    [
+      [0, 1, 0],
+      [1, 1, 0],
+      [1, 0, 0]
+    ]
+  ],
+  offset: [1, 0]
+}
+
+PiecesShapes['s'] = {
+  color: '#008f32',
+  shapes: [
+    [
+      [0, 1, 1],
+      [1, 1, 0],
+      [0, 0, 0]
+    ],
+    [
+      [1, 0, 0],
+      [1, 1, 0],
+      [0, 1, 0]
+    ]
+  ],
+  offset: [1, 0]
+}
+
+PiecesShapes['il'] = {
+  color: '#ea9e22',
+  shapes: [
+    [
+      [1, 1, 1],
+      [0, 0, 1],
+      [0, 0, 0]
+    ],
+    [
+      [0, 1, 0],
+      [0, 1, 0],
+      [1, 1, 0]
+    ],
+    [
+      [1, 0, 0],
+      [1, 1, 1],
+      [0, 0, 0]
+    ],
+    [
+      [1, 1, 0],
+      [1, 0, 0],
+      [1, 0, 0]
+    ]
+  ],
+  offset: [1, 0]
+}
+
+PiecesShapes['l'] = {
+  color: '#f26aff',
+  shapes: [
+    [
+      [1, 1, 1],
+      [1, 0, 0],
+      [0, 0, 0]
+    ],
+    [
+      [1, 1, 0],
+      [0, 1, 0],
+      [0, 1, 0]
+    ],
+    [
+      [0, 0, 1],
+      [1, 1, 1],
+      [0, 0, 0]
+    ],
+    [
+      [1, 0, 0],
+      [1, 0, 0],
+      [1, 1, 0]
+    ]
+  ],
+  offset: [1, 0]
+}
+
+PiecesShapes['c'] = {
+  color: '#4240ff',
+  shapes: [
+    [
+      [1, 1],
+      [1, 1]
+    ]
+  ],
+  offset: [0, 0]
+}
+
+PiecesShapes['t'] = {
+  // color: "#6b6d00",
+  // color: "#afaf24",
+  color: '#afcf30',
+  shapes: [
+    [
+      [1, 1, 1],
+      [0, 1, 0],
+      [0, 0, 0]
+    ],
+    [
+      [0, 1, 0],
+      [1, 1, 0],
+      [0, 1, 0]
+    ],
+    [
+      [0, 1, 0],
+      [1, 1, 1],
+      [0, 0, 0]
+    ],
+    [
+      [1, 0, 0],
+      [1, 1, 0],
+      [1, 0, 0]
+    ]
+  ],
+  offset: [1, 0]
+}
+
+PiecesShapes['i'] = {
+  color: '#b53120',
+  shapes: [
+    [
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0]
+    ]
+  ],
+  offset: [1, 0]
+}
+
+PiecesShapes['w'] = {
+  color: '#ffdd00',
+  shapes: [
+    [
+      [1, 1, 0, 0],
+      [0, 1, 1, 0],
+      [0, 0, 1, 1],
+      [0, 0, 0, 1]
+    ],
+    [
+      [0, 0, 0, 1],
+      [0, 0, 1, 1],
+      [0, 1, 1, 0],
+      [1, 1, 0, 0]
+    ],
+    [
+      [1, 0, 0, 0],
+      [1, 1, 0, 0],
+      [0, 1, 1, 0],
+      [0, 0, 1, 1]
+    ],
+    [
+      [0, 0, 1, 1],
+      [0, 1, 1, 0],
+      [1, 1, 0, 0],
+      [1, 0, 0, 0]
+    ]
+  ],
+  offset: [1, 0]
+}
+
+PiecesShapes['o'] = {
+  color: '#04a0fb',
+  shapes: [
+    [
+      [0, 1, 1, 0],
+      [1, 0, 0, 1],
+      [0, 1, 1, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 1, 0, 0],
+      [1, 0, 1, 0],
+      [1, 0, 1, 0],
+      [0, 1, 0, 0]
+    ]
+  ],
+  offset: [1, 0]
+}
+
+PiecesShapes['ii'] = {
+  color: '#ec1346',
+  shapes: [
+    [
+      [1, 0, 0, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [1, 0, 0, 1]
+    ],
+    [
+      [1, 0, 1, 0],
+      [0, 0, 0, 0],
+      [1, 0, 1, 0],
+      [0, 0, 0, 0]
+    ]
+  ],
+  offset: [1, 0]
+}
+
+PiecesShapes['ca'] = {
+  color: '#ec1346',
+  shapes: [
+    [
+      [1, 1, 0],
+      [1, 0, 0],
+      [1, 1, 0]
+    ],
+    [
+      [1, 1, 1],
+      [1, 0, 1],
+      [0, 0, 0]
+    ],
+    [
+      [0, 1, 1],
+      [0, 0, 1],
+      [0, 1, 1]
+    ],
+    [
+      [0, 0, 0],
+      [1, 0, 1],
+      [1, 1, 1]
+    ]
+  ],
+  offset: [1, 0]
+}
+
 function Piece (type, options) {
-  var tmp = {}
-  Object.assign(tmp, {
-    hard: false
-  }, options)
-  options = tmp
-  // pieces first Y then X
-  var pieces = {}
-
-  pieces['is'] = {
-    color: '#64b0ff',
-    shapes: [
-      [
-        [1, 1, 0],
-        [0, 1, 1],
-        [0, 0, 0]
-      ],
-      [
-        [0, 1, 0],
-        [1, 1, 0],
-        [1, 0, 0]
-      ]
-    ],
-    offset: [1, 0]
+  this.rotateClockwise = function () {
+    this.shapeIndex += 1
+    this.shapeIndex = this.shapeIndex >= this.shapes.length ? 0 : this.shapeIndex
   }
 
-  pieces['s'] = {
-    color: '#008f32',
-    shapes: [
-      [
-        [0, 1, 1],
-        [1, 1, 0],
-        [0, 0, 0]
-      ],
-      [
-        [1, 0, 0],
-        [1, 1, 0],
-        [0, 1, 0]
-      ]
-    ],
-    offset: [1, 0]
-  }
-
-  pieces['il'] = {
-    color: '#ea9e22',
-    shapes: [
-      [
-        [1, 1, 1],
-        [0, 0, 1],
-        [0, 0, 0]
-      ],
-      [
-        [0, 1, 0],
-        [0, 1, 0],
-        [1, 1, 0]
-      ],
-      [
-        [1, 0, 0],
-        [1, 1, 1],
-        [0, 0, 0]
-      ],
-      [
-        [1, 1, 0],
-        [1, 0, 0],
-        [1, 0, 0]
-      ]
-    ],
-    offset: [1, 0]
-  }
-
-  pieces['l'] = {
-    color: '#f26aff',
-    shapes: [
-      [
-        [1, 1, 1],
-        [1, 0, 0],
-        [0, 0, 0]
-      ],
-      [
-        [1, 1, 0],
-        [0, 1, 0],
-        [0, 1, 0]
-      ],
-      [
-        [0, 0, 1],
-        [1, 1, 1],
-        [0, 0, 0]
-      ],
-      [
-        [1, 0, 0],
-        [1, 0, 0],
-        [1, 1, 0]
-      ]
-    ],
-    offset: [1, 0]
-  }
-
-  pieces['c'] = {
-    color: '#4240ff',
-    shapes: [
-      [
-        [1, 1],
-        [1, 1]
-      ]
-    ],
-    offset: [0, 0]
-  }
-
-  pieces['t'] = {
-    // color: "#6b6d00",
-    // color: "#afaf24",
-    color: '#afcf30',
-    shapes: [
-      [
-        [1, 1, 1],
-        [0, 1, 0],
-        [0, 0, 0]
-      ],
-      [
-        [0, 1, 0],
-        [1, 1, 0],
-        [0, 1, 0]
-      ],
-      [
-        [0, 1, 0],
-        [1, 1, 1],
-        [0, 0, 0]
-      ],
-      [
-        [1, 0, 0],
-        [1, 1, 0],
-        [1, 0, 0]
-      ]
-    ],
-    offset: [1, 0]
-  }
-
-  pieces['i'] = {
-    color: '#b53120',
-    shapes: [
-      [
-        [1, 1, 1, 1],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0]
-      ]
-    ],
-    offset: [1, 0]
-  }
-
-  pieces['w'] = {
-    color: '#ffdd00',
-    shapes: [
-      [
-        [1, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 0, 1, 1],
-        [0, 0, 0, 1]
-      ],
-      [
-        [0, 0, 0, 1],
-        [0, 0, 1, 1],
-        [0, 1, 1, 0],
-        [1, 1, 0, 0]
-      ],
-      [
-        [1, 0, 0, 0],
-        [1, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 0, 1, 1]
-      ],
-      [
-        [0, 0, 1, 1],
-        [0, 1, 1, 0],
-        [1, 1, 0, 0],
-        [1, 0, 0, 0]
-      ]
-    ],
-    offset: [1, 0]
-  }
-
-  pieces['o'] = {
-    color: '#04a0fb',
-    shapes: [
-      [
-        [0, 1, 1, 0],
-        [1, 0, 0, 1],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 1, 0, 0],
-        [1, 0, 1, 0],
-        [1, 0, 1, 0],
-        [0, 1, 0, 0]
-      ]
-    ],
-    offset: [1, 0]
-  }
-
-  pieces['ii'] = {
-    color: '#ec1346',
-    shapes: [
-      [
-        [1, 0, 0, 1],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [1, 0, 0, 1]
-      ],
-      [
-        [1, 0, 1, 0],
-        [0, 0, 0, 0],
-        [1, 0, 1, 0],
-        [0, 0, 0, 0]
-      ]
-    ],
-    offset: [1, 0]
-  }
-
-  var piece = null
-
-  if (type) {
-    piece = pieces[type]
-  }
-
-  if (piece == null) {
-    if (options.hard) {
-      type = FisherYatesShuffle([
-        'w', 'o', 'ii'
-      ])[0]
-    } else {
-      type = FisherYatesShuffle([
-        'c', 's', 'is', 'i', 'l', 'il', 't'
-      ])[0]
-    }
-    piece = pieces[type]
-  }
-
-  // TODO count[type] += 1
-
-  this.type = type
-  this.color = piece.color
-  this.shapes = piece.shapes
-  this.offset = piece.offset
-  this.shape_idx = 0
-
-  this.rotate_r = function () {
-    this.shape_idx += 1
-    this.shape_idx = this.shape_idx >= this.shapes.length ? 0 : this.shape_idx
-  }
-
-  this.rotate_l = function () {
-    this.shape_idx -= 1
-    this.shape_idx = this.shape_idx < 0 ? this.shapes.length - 1 : this.shape_idx
+  this.rotateCounterClockwise = function () {
+    this.shapeIndex -= 1
+    this.shapeIndex = this.shapeIndex < 0 ? this.shapes.length - 1 : this.shapeIndex
   }
 
   this.draw = function (groundObject, pos) {
+    // this updates all the blocks on the groundObject to draw the piece
     return this.piece_test(groundObject, pos, 'draw')
   }
   this.collide = function (groundObject, pos) {
+    // check if
     return this.piece_test(groundObject, pos, 'collide')
   }
   this.outside = function (groundObject, pos) {
@@ -273,15 +269,19 @@ function Piece (type, options) {
   }
   this.piece_test = function (groundObject, pos, method) {
     // method could be one of "draw", "collide", "outside"
+    // draw will update the blocks on the ground based on the piece position
+    // collide will check if the piece collides with the ground
+    // outside will check if the piece if outside the ground area
     var ground = groundObject.ground
-    var pattern = this.shapes[this.shape_idx]
+    // the shape of the piece
+    var pattern = this.shapes[this.shapeIndex]
     var block = null
-    function get_p (p, y, x) {
-      var r = 0
+    function shouldDrawALine (p, y, x) {
+      // this returns if a line should be painted on the side of the rectangle pixel
       if (p[y] && p[y][x]) {
-        r = p[y][x]
+        return 1 - p[y][x]
       }
-      return 1 - r
+      return 1
     }
     for (var y = 0; y < pattern.length; y++) {
       for (var x = 0; x < pattern[y].length; x++) {
@@ -298,15 +298,14 @@ function Piece (type, options) {
           if (method === 'collide' && block && !block.empty) {
             return true
           } else if (method === 'draw' && block) {
-            block.set_color(this.color)
+            block.setColor(this.color)
             block.empty = false
             block.lines = [
-              get_p(pattern, y - 1, x),
-              get_p(pattern, y, x + 1),
-              get_p(pattern, y + 1, x),
-              get_p(pattern, y, x - 1)
+              shouldDrawALine(pattern, y - 1, x),
+              shouldDrawALine(pattern, y, x + 1),
+              shouldDrawALine(pattern, y + 1, x),
+              shouldDrawALine(pattern, y, x - 1)
             ]
-            // block.draw()
           } else if (method === 'outside' && block == null) {
             return true
           }
@@ -317,6 +316,33 @@ function Piece (type, options) {
       return false
     }
   }
+
+  this.initialize = function (type) {
+    var piece
+    if (type) {
+      piece = PiecesShapes[type]
+    }
+    if (!piece) {
+      if (this.options.hard) {
+        type = FisherYatesShuffle(['w', 'o', 'ii', 'ca'])[0]
+      } else {
+        type = FisherYatesShuffle(['c', 's', 'is', 'i', 'l', 'il', 't'])[0]
+      }
+      piece = PiecesShapes[type]
+    }
+    this.type = type
+    this.color = piece.color
+    this.shapes = piece.shapes
+    this.offset = piece.offset
+    this.shapeIndex = 0
+  }
+
+  this.options = {
+    hard: false
+  }
+  Object.assign(this.options, options)
+  this.initialize()
+  // pieces first Y then X
 }
 
 export default Piece

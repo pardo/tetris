@@ -2,34 +2,28 @@ import {changeColorLuminance} from './helpers'
 
 function Block (x, y, options) {
   // this represents a single pixel from the tetris
-  var self = this
   this.draw = function (roughCanvas, drawEmpty) {
     // drawEmpty lets you know if the empty cell show be painted or not
-    if (self.empty && !drawEmpty) {
-      return
-    }
-    var x = self.x
-    var y = self.y
-    var w = self.size
-    var h = self.size
+    if (this.empty && !drawEmpty) { return }
+    var x = this.x
+    var y = this.y
+    var w = this.size
+    var h = this.size
     // strokeWidth
-    var lw = self.size * 0.05
-    var l = self.lines
+    var lw = this.size * 0.05
+    var l = this.lines
     var hlw = lw / 2
-    var color = self.color
-    var strokeColor = self.strokeColor
-
-    if (self.empty) {
-      color = self.empty_color
-      strokeColor = self.empty_color
-    }
 
     roughCanvas.rectangle(x, y, w, h, {
       roughness: 0.8,
       stroke: 'rgba(0,0,0,0)',
-      fill: color,
+      fill: this.empty ? this.emptyColor : this.color,
       fillStyle: 'zigzag' // solid fill
     })
+
+    if (this.empty) {
+      return
+    }
 
     if (l[0] === 1) {
       roughCanvas.line(x, y + hlw, x + w, y + hlw, {strokeWidth: lw})
@@ -53,13 +47,13 @@ function Block (x, y, options) {
     }
   }
 
-  this.set_color = function (color) {
+  this.setColor = function (color) {
     this.color = color
     this.strokeColor = changeColorLuminance(this.color, -0.5)
   }
 
-  this.copy_from = function (block) {
-    this.set_color(block.color)
+  this.copyFrom = function (block) {
+    this.setColor(block.color)
     this.empty = block.empty
     this.lines[0] = block.lines[0]
     this.lines[1] = block.lines[1]
@@ -67,7 +61,7 @@ function Block (x, y, options) {
     this.lines[3] = block.lines[3]
   }
 
-  this.set_pos = function (x, y) {
+  this.setPos = function (x, y) {
     this.x = x
     this.y = y
   }
@@ -79,15 +73,16 @@ function Block (x, y, options) {
   // initialization
   this.options = {
     size: 15,
-    empty_color: '#1a1a1a',
+    emptyColor: '#1a1a1a',
     color: '#1a1a1a'
   }
   Object.assign(this.options, options)
 
   this.empty = true
-  this.empty_color = this.options.empty_color
-  this.set_color(this.options.color)
-  this.size = this.options.size
+  this.emptyColor = this.options.emptyColor
+  this.setColor(this.options.color)
+  this.setSize(this.options.size)
+  this.setPos(x, y)
   this.x = x
   this.y = y
   // top right bottom left

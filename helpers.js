@@ -100,7 +100,7 @@ function getWindowSizePoint () {
     winW = document.body.offsetWidth
     winH = document.body.offsetHeight
   }
-  if (document.compatMode == 'CSS1Compat' &&
+  if (document.compatMode === 'CSS1Compat' &&
   document.documentElement &&
   document.documentElement.offsetWidth) {
     winW = document.documentElement.offsetWidth

@@ -1,5 +1,4 @@
 import './main.css'
-import rough from 'roughjs'
 import {getWindowSizePoint, throttle} from './helpers'
 import Tetris from './tetris'
 import Drawable from './drawable'
@@ -62,7 +61,7 @@ function handleKeyboard (event) {
     case 38:
       // up
       if (event.type === 'keyup') {
-        tetris.piece_rotate_left()
+        tetris.rotatePieceCounterClockwise()
       }
       break
     case 39:
@@ -82,7 +81,7 @@ function handleKeyboard (event) {
     case 32:
       // space
       if (spaceKeyCanRotate) {
-        tetris.piece_rotate_left()
+        tetris.rotatePieceCounterClockwise()
         spaceKeyCanRotate = false
       }
       if (event.type === 'keyup') {
@@ -91,6 +90,9 @@ function handleKeyboard (event) {
       break
     case 78:
       // n
+      if (event.type === 'keyup') {
+        tetris.ground.meld()
+      }
       break
     default:
       console.log('which', event.which)

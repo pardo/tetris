@@ -1,68 +1,27 @@
 import Block from './block'
 
-function Ground (blocks_w, blocks_h, block_size) {
-  this.blocks_w = blocks_w
-  this.blocks_h = blocks_h
-  this.block_size = block_size
-  this.blocks = []
-  this.ground = []
-
-  // Init
-  var b = null
-  var col = []
-
-  for (var w = 0; w < this.blocks_w; w++) {
-    col = []
-    for (var h = 0; h < this.blocks_h; h++) {
-      b = new Block(
-        w * this.block_size,
-        h * this.block_size,
-        {
-          size: block_size,
-        }
-      )
-      col.push(b)
-      this.blocks.push(b)
-    }
-    this.ground.push(col)
-  }
-
-  this.mirror_y = function (pos) {
-    var dis = this.blocks_h - pos
-    var end = pos + parseInt(dis / 2)
-    var dis_from_end = 1
-    var tmp_b = new Block(0, 0)
-  
-    for (var w = 0; w < this.blocks_w; w++) {
-      for (var h = pos; h < end; h++) {
-        tmp_b.copy_from(this.ground[w][h])
-        this.ground[w][h].copy_from(this.ground[w][this.blocks_h - dis_from_end])
-        this.ground[w][this.blocks_h - dis_from_end].copy_from(tmp_b)
-      }
-      dis_from_end += 1
-    }
-  }
-
-  this.add_random_bottom = function (lines) {
-    for (var w = 0; w < this.blocks_w; w++) {
-      for (var h = 0; h < this.blocks_h; h++) {
-        if (this.ground[w][h + lines] != null ) {
-          this.ground[w][h].copy_from(this.ground[w][h + lines])
+function Ground (groundWidth, groundHeight, blockSize) {
+  this.addRandomBottom = function (lines) {
+    // move the lines up so the random blocks don't endup
+    // overriden user made blocks
+    var w
+    var h
+    var b
+    for (w = 0; w < this.groundWidth; w++) {
+      for (h = 0; h < this.groundHeight; h++) {
+        if (this.ground[w][h + lines] != null) {
+          this.ground[w][h].copyFrom(this.ground[w][h + lines])
         }
       }
     }
-    var b = null
-    for (var w = 0; w < this.blocks_w; w++) {
-      for (var h = this.blocks_h - lines; h < this.blocks_h; h++) {
-        console.log(w, h)
+    // add random bottom
+    for (w = 0; w < this.groundWidth; w++) {
+      for (h = this.groundHeight - lines; h < this.groundHeight; h++) {
         b = this.ground[w][h]
-        b.set_color('#af5089')
+        b.setColor('#af5089')
         if (Math.random() < 0.7) {
           b.empty = false
-          b.lines[0] = 1
-          b.lines[1] = 1
-          b.lines[2] = 1
-          b.lines[3] = 1
+          b.lines = [1, 1, 1, 1]
         } else {
           b.empty = true
         }
@@ -71,55 +30,59 @@ function Ground (blocks_w, blocks_h, block_size) {
   }
 
   this.hide = function (options) {
+    // mark all the blocks as empty
     this.mapGroundBlocks(function (w, h, block) {
       block.empty = true
     })
   }
 
-  this.set_block_size = function (size) {
-    this.block_size = size
-    for (var w = 0; w < this.blocks_w; w++) {
-      for (var h = 0; h < this.blocks_h; h++) {
-        this.ground[w][h].setSize(this.block_size)
-        this.ground[w][h].set_pos(
-          w * this.block_size,
-          h * this.block_size
+  this.setBlockSize = function (size) {
+    this.blockSize = size
+    for (var w = 0; w < this.groundWidth; w++) {
+      for (var h = 0; h < this.groundHeight; h++) {
+        // change the size of the block
+        this.ground[w][h].setSize(this.blockSize)
+        // reposition the block inside the canvas
+        this.ground[w][h].setPos(
+          w * this.blockSize,
+          h * this.blockSize
         )
       }
     }
   }
 
   this.meld = function (size) {
-    function get_p (p, y, x) {
-      var r = 0
+    // remove lines inside continous blocks
+    function shouldDrawALine (p, y, x) {
       if (p[x] && p[x][y]) {
-        r = p[x][y].empty ? 0:1
+        return p[x][y].empty ? 1 : 0
+      } else {
+        return 1
       }
-      return 1 - r
     }
 
-    for (var w = 0; w < this.blocks_w; w++) {
-      for (var h = 0; h < this.blocks_h; h++) {
+    for (var w = 0; w < this.groundWidth; w++) {
+      for (var h = 0; h < this.groundHeight; h++) {
         this.ground[w][h].lines = [
-          get_p(this.ground, h - 1, w),
-          get_p(this.ground, h, w + 1),
-          get_p(this.ground, h + 1, w),
-          get_p(this.ground, h, w - 1)
+          shouldDrawALine(this.ground, h - 1, w), // top
+          shouldDrawALine(this.ground, h, w + 1), // right
+          shouldDrawALine(this.ground, h + 1, w), // bottom
+          shouldDrawALine(this.ground, h, w - 1) // left
         ]
       }
     }
   }
 
   this.mapGroundBlocks = function (callback) {
-    for (var w = 0; w < this.blocks_w; w++) {
-      for (var h = 0; h < this.blocks_h; h++) {
+    for (var w = 0; w < this.groundWidth; w++) {
+      for (var h = 0; h < this.groundHeight; h++) {
         callback(w, h, this.ground[w][h], this.ground)
       }
     }
   }
 
   this.ended = function () {
-    for (var w = 0; w < this.blocks_w; w++) {
+    for (var w = 0; w < this.groundWidth; w++) {
       if (!this.ground[w][1].empty || !this.ground[w][1].empty) {
         return true
       }
@@ -130,14 +93,14 @@ function Ground (blocks_w, blocks_h, block_size) {
   this.getCompletedLines = function () {
     var completedLines = []
     var complete = 0
-    for (var h = 0; h < this.blocks_h; h++) {
+    for (var h = 0; h < this.groundHeight; h++) {
       complete = 0
-      for (var w = 0; w < this.blocks_w; w++) {
+      for (var w = 0; w < this.groundWidth; w++) {
         if (!this.ground[w][h].empty) {
           complete += 1
         }
       }
-      if (complete == this.blocks_w) {
+      if (complete === this.groundWidth) {
         completedLines.push(h)
       }
     }
@@ -145,12 +108,12 @@ function Ground (blocks_w, blocks_h, block_size) {
   }
 
   this.removeLine = function (line) {
-    for (var w = 0; w < this.blocks_w; w++) {
-      for (var h = 0; h < this.blocks_h; h++) {
-        if (h == line) {
-        // remove line
+    for (var w = 0; w < this.groundWidth; w++) {
+      for (var h = 0; h < this.groundHeight; h++) {
+        if (h === line) {
+          // remove line
           for (var ht = h; ht > 0; ht--) {
-            this.ground[w][ht].copy_from(this.ground[w][ht - 1])
+            this.ground[w][ht].copyFrom(this.ground[w][ht - 1])
           }
           this.ground[w][h].lines[2] = 1
           if (this.ground[w][h + 1]) {
@@ -165,6 +128,32 @@ function Ground (blocks_w, blocks_h, block_size) {
     for (var i = 0; i < lines.length; i++) {
       this.removeLine(lines[i])
     }
+  }
+
+  this.groundWidth = groundWidth
+  this.groundHeight = groundHeight
+  this.blockSize = blockSize
+  this.blocks = []
+  this.ground = []
+
+  // Init
+  var b
+  var col = []
+
+  for (var w = 0; w < this.groundWidth; w++) {
+    col = []
+    for (var h = 0; h < this.groundHeight; h++) {
+      b = new Block(
+        w * this.blockSize,
+        h * this.blockSize,
+        {
+          size: blockSize
+        }
+      )
+      col.push(b)
+      this.blocks.push(b)
+    }
+    this.ground.push(col)
   }
 }
 
