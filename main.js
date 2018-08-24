@@ -15,11 +15,10 @@ var tetris = new Tetris({
   drawableBackground: background,
   drawablePieces: pieces
 })
-tetris.resize(getWindowSizePoint().width, getWindowSizePoint().height)
 
 function loop () {
   tetris.pieceMoveDown({ auto: true })
-  setTimeout(loop, 1000)
+  setTimeout(loop, 800)
 }
 loop()
 
@@ -27,19 +26,20 @@ setInterval(function () {
   tetris.draw()
 }, 30) // 40fps
 
-window.addEventListener('load', function () {
+function resize () {
   let size = getWindowSizePoint()
+  let blockSize = size.height / tetris.options.groundHeight
+  if (blockSize * tetris.options.groundWidth > size.width) {
+    // blocksize exceed width crop using width
+    blockSize = size.width / tetris.options.groundWidth
+  }
   background.resize(size)
   pieces.resize(size)
-  tetris.resize(size.width, size.height)
-})
+  tetris.resize(blockSize)
+}
 
-window.addEventListener('resize', function () {
-  let size = getWindowSizePoint()
-  background.resize(size)
-  pieces.resize(size)
-  tetris.resize(size.width, size.height)
-})
+window.addEventListener('load', resize)
+window.addEventListener('resize', resize)
 
 var moveDown = throttle(function () { tetris.pieceMoveDown() }, 40)
 var moveLeft = throttle(function () { tetris.pieceMoveLeft() }, 100)
@@ -91,7 +91,6 @@ function handleKeyboard (event) {
     case 78:
       // n
       if (event.type === 'keyup') {
-        tetris.ground.meld()
       }
       break
     default:

@@ -1,4 +1,5 @@
 import Block from './block'
+import {range} from './helpers'
 
 function Ground (groundWidth, groundHeight, blockSize) {
   this.addRandomBottom = function (lines) {
@@ -53,21 +54,30 @@ function Ground (groundWidth, groundHeight, blockSize) {
 
   this.meld = function (size) {
     // remove lines inside continous blocks
-    function shouldDrawALine (p, y, x) {
-      if (p[x] && p[x][y]) {
-        return p[x][y].empty ? 1 : 0
+    function shouldDrawALine (ground, block, y, x) {
+      if (ground[x] && ground[x][y]) {
+        if (ground[x][y].empty) {
+          return 1 // draw a line
+        } else {
+          // if the block is not empty
+          // then check if is the same color
+          // and draw a line if not the same
+          return ground[x][y].color === block.color ? 0 : 1
+        }
       } else {
+        // outside the ground area, always draw a line
         return 1
       }
     }
 
     for (var w = 0; w < this.groundWidth; w++) {
       for (var h = 0; h < this.groundHeight; h++) {
+        var block = this.ground[w][h]
         this.ground[w][h].lines = [
-          shouldDrawALine(this.ground, h - 1, w), // top
-          shouldDrawALine(this.ground, h, w + 1), // right
-          shouldDrawALine(this.ground, h + 1, w), // bottom
-          shouldDrawALine(this.ground, h, w - 1) // left
+          shouldDrawALine(this.ground, block, h - 1, w), // top
+          shouldDrawALine(this.ground, block, h, w + 1), // right
+          shouldDrawALine(this.ground, block, h + 1, w), // bottom
+          shouldDrawALine(this.ground, block, h, w - 1) // left
         ]
       }
     }
@@ -91,6 +101,7 @@ function Ground (groundWidth, groundHeight, blockSize) {
   }
 
   this.getCompletedLines = function () {
+    // returns the line number of lines with non empty block from side to side
     var completedLines = []
     var complete = 0
     for (var h = 0; h < this.groundHeight; h++) {
@@ -129,6 +140,63 @@ function Ground (groundWidth, groundHeight, blockSize) {
       this.removeLine(lines[i])
     }
   }
+  this.drawGrid = function (drawable) {
+    let roughCanvas = drawable.roughCanvas
+    let options = {
+      stroke: 'rgb(0, 0, 0, 0.5)',
+      strokeWidth: this.blockSize / 10,
+      bowing: 0.6
+    }
+    let gridOptions = {
+      roughness: 0.6,
+      stroke: 'rgb(203, 255, 241, 0.7)',
+      strokeWidth: this.blockSize / 40
+    }
+    let top = 0
+    let bottom = this.groundHeight * this.blockSize
+    let left = 0
+    let right = this.groundWidth * this.blockSize
+    range(left, right, this.blockSize).map((position) => {
+      // vertical lines
+      roughCanvas.line(
+        position, bottom,
+        position, top,
+        gridOptions
+      )
+    })
+    range(top, bottom, this.blockSize).map((position) => {
+      // horizontal lines
+      roughCanvas.line(
+        left, position,
+        right, position,
+        gridOptions
+      )
+    })
+    // top left > top right
+    roughCanvas.line(
+      left, top,
+      right, top,
+      options
+    )
+    // top right > bottom right
+    roughCanvas.line(
+      right, top,
+      right, bottom,
+      options
+    )
+    // bottom right > bottom left
+    roughCanvas.line(
+      right, bottom,
+      left, bottom,
+      options
+    )
+    // bottom left > top left
+    roughCanvas.line(
+      left, bottom,
+      left, top,
+      options
+    )
+  }
 
   this.groundWidth = groundWidth
   this.groundHeight = groundHeight
@@ -139,7 +207,6 @@ function Ground (groundWidth, groundHeight, blockSize) {
   // Init
   var b
   var col = []
-
   for (var w = 0; w < this.groundWidth; w++) {
     col = []
     for (var h = 0; h < this.groundHeight; h++) {

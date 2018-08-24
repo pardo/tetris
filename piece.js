@@ -246,6 +246,32 @@ PiecesShapes['ca'] = {
 }
 
 function Piece (type, options) {
+  this.initialize = function (type) {
+    // pieces first Y then X
+    this.options = {
+      hard: false
+    }
+    Object.assign(this.options, options)
+
+    var piece
+    if (type) {
+      piece = PiecesShapes[type]
+    }
+    if (!piece) {
+      if (this.options.hard) {
+        type = FisherYatesShuffle(['w', 'o', 'ii', 'ca'])[0]
+      } else {
+        type = FisherYatesShuffle(['c', 's', 'is', 'i', 'l', 'il', 't'])[0]
+      }
+      piece = PiecesShapes[type]
+    }
+    this.type = type
+    this.color = piece.color
+    this.shapes = piece.shapes
+    this.offset = piece.offset
+    this.shapeIndex = 0
+  }
+
   this.rotateClockwise = function () {
     this.shapeIndex += 1
     this.shapeIndex = this.shapeIndex >= this.shapes.length ? 0 : this.shapeIndex
@@ -258,16 +284,17 @@ function Piece (type, options) {
 
   this.draw = function (groundObject, pos) {
     // this updates all the blocks on the groundObject to draw the piece
-    return this.piece_test(groundObject, pos, 'draw')
+    return this.placeOnGround(groundObject, pos, 'draw')
   }
   this.collide = function (groundObject, pos) {
-    // check if
-    return this.piece_test(groundObject, pos, 'collide')
+    // check if the piece collides with the ground at position
+    return this.placeOnGround(groundObject, pos, 'collide')
   }
   this.outside = function (groundObject, pos) {
-    return this.piece_test(groundObject, pos, 'outside')
+    // check if the piece is outside the ground are
+    return this.placeOnGround(groundObject, pos, 'outside')
   }
-  this.piece_test = function (groundObject, pos, method) {
+  this.placeOnGround = function (groundObject, pos, method) {
     // method could be one of "draw", "collide", "outside"
     // draw will update the blocks on the ground based on the piece position
     // collide will check if the piece collides with the ground
@@ -317,32 +344,7 @@ function Piece (type, options) {
     }
   }
 
-  this.initialize = function (type) {
-    var piece
-    if (type) {
-      piece = PiecesShapes[type]
-    }
-    if (!piece) {
-      if (this.options.hard) {
-        type = FisherYatesShuffle(['w', 'o', 'ii', 'ca'])[0]
-      } else {
-        type = FisherYatesShuffle(['c', 's', 'is', 'i', 'l', 'il', 't'])[0]
-      }
-      piece = PiecesShapes[type]
-    }
-    this.type = type
-    this.color = piece.color
-    this.shapes = piece.shapes
-    this.offset = piece.offset
-    this.shapeIndex = 0
-  }
-
-  this.options = {
-    hard: false
-  }
-  Object.assign(this.options, options)
   this.initialize()
-  // pieces first Y then X
 }
 
 export default Piece

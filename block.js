@@ -2,54 +2,55 @@ import {changeColorLuminance} from './helpers'
 
 function Block (x, y, options) {
   // this represents a single pixel from the tetris
-  this.draw = function (roughCanvas, drawEmpty) {
+  this.draw = function (drawable, drawEmpty) {
+    let roughCanvas = drawable.roughCanvas
     // drawEmpty lets you know if the empty cell show be painted or not
     if (this.empty && !drawEmpty) { return }
-    var x = this.x
-    var y = this.y
-    var w = this.size
-    var h = this.size
-    // strokeWidth
-    var lw = this.size * 0.05
-    var l = this.lines
-    var hlw = lw / 2
-
-    roughCanvas.rectangle(x, y, w, h, {
-      roughness: 0.8,
-      stroke: 'rgba(0,0,0,0)',
+    // draw the block
+    roughCanvas.rectangle(this.x, this.y, this.size, this.size, {
+      hachureGap: 4,
+      roughness: 1.8,
+      stroke: 'rgba(0,0,0,0.1)',
       fill: this.empty ? this.emptyColor : this.color,
       fillStyle: 'zigzag' // solid fill
     })
-
-    if (this.empty) {
-      return
+    if (this.empty) { return }
+    // never draw lines on empty blocks
+    this.drawBlockLines(drawable)
+  }
+  this.drawBlockLines = function (drawable) {
+    var roughCanvas = drawable.roughCanvas
+    var offset = this.size * 0.12 // this will draw lines outside the block
+    var left = this.x
+    var top = this.y
+    var bottom = this.y + this.size
+    var right = this.x + this.size
+    // strokeWidth
+    var lineOptions = {
+      strokeWidth: this.size * 0.06,
+      stroke: this.strokeColor
     }
-
-    if (l[0] === 1) {
-      roughCanvas.line(x, y + hlw, x + w, y + hlw, {strokeWidth: lw})
-    } else {
-      roughCanvas.line(x, y + hlw, x + lw, y + hlw, {strokeWidth: lw})
+    // top line
+    if (this.lines[0] === 1) {
+      roughCanvas.line(left - offset, top, right + offset, top, lineOptions)
     }
-    if (l[1] === 1) {
-      roughCanvas.line(x + w - hlw, y, x + w - hlw, y + h, {strokeWidth: lw})
-    } else {
-      roughCanvas.line(x + w - hlw, y, x + w - hlw, y + lw, {strokeWidth: lw})
+    // right line
+    if (this.lines[1] === 1) {
+      roughCanvas.line(right, top - offset, right, bottom + offset, lineOptions)
     }
-    if (l[2] === 1) {
-      roughCanvas.line(x + w, y + h - hlw, x, y + h - hlw, {strokeWidth: lw})
-    } else {
-      roughCanvas.line(x + w, y + h - hlw, x + w - lw, y + h - hlw, {strokeWidth: lw})
+    // bottom line
+    if (this.lines[2] === 1) {
+      roughCanvas.line(left - offset, bottom, right + offset, bottom, lineOptions)
     }
-    if (l[3] === 1) {
-      roughCanvas.line(x + hlw, y + h, x + hlw, y, {strokeWidth: lw})
-    } else {
-      roughCanvas.line(x + hlw, y + h, x + hlw, y + h - lw, {strokeWidth: lw})
+    // left line
+    if (this.lines[3] === 1) {
+      roughCanvas.line(left, top - offset, left, bottom + offset, lineOptions)
     }
   }
-
   this.setColor = function (color) {
     this.color = color
-    this.strokeColor = changeColorLuminance(this.color, -0.5)
+    // add transparency
+    this.strokeColor = changeColorLuminance(this.color, -0.7) + '80'
   }
 
   this.copyFrom = function (block) {
