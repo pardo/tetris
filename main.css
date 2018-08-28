@@ -3,10 +3,25 @@ html, body {
   margin: 0;
 }
 
-.container-tetris > canvas {
+.tetris-container {
+  display: flex;
+  justify-content: center;
   width: 100%;
   height: 100%;
+}
+
+.tetris-container-inner {
+  position: relative;
+  margin: 4px;
+}
+.tetris-container-inner canvas {
+  border: 1px solid #777777;
+}
+.tetris-container-inner canvas:last-child {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+#main-tetris {
 }

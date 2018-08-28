@@ -116,6 +116,13 @@ function getWindowSizePoint () {
   }
 }
 
+function getElementSize (element) {
+  return {
+    width: element.offsetWidth,
+    height: element.offsetHeight
+  }
+}
+
 function downloadText (filename, text) {
   // download content as a data test
   var pom = document.createElement('a')
@@ -221,5 +228,6 @@ export {
   FisherYatesShuffle,
   goFullscreen,
   isTouchDevice,
-  changeColorLuminance
+  changeColorLuminance,
+  getElementSize
 }
