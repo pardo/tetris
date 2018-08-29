@@ -121,6 +121,7 @@ function HTMLTetrisGame (parent, options) {
       tetris.draw()
     }, 500) // 40fps
   }
+  this.tetris = tetris
 }
 
 export default HTMLTetrisGame

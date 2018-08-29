@@ -56,6 +56,57 @@ function Tetris (options) {
     this.currentPieceGroundDirty = true
   }
 
+  this.serialize = function (previousUpdate) {
+    var serializedGround = []
+    for (let w = 0; w < this.ground.groundWidth; w++) {
+      for (let h = 0; h < this.ground.groundHeight; h++) {
+        var cpb = this.currentPieceGround.ground[w][h]
+        var b = this.ground.ground[w][h]
+        var blockToPush = null
+        if (b.empty && !cpb.empty) {
+          blockToPush = cpb
+        } else if (!b.empty && cpb.empty) {
+          blockToPush = b
+        }
+        if (blockToPush) {
+          serializedGround.push([
+            (w << 6) + h,
+            parseInt(blockToPush.color.replace('#', '0x')),
+            blockToPush.lines[0] * 1 +
+            blockToPush.lines[1] * 2 +
+            blockToPush.lines[2] * 4 +
+            blockToPush.lines[3] * 8
+          ])
+        } else {
+          serializedGround.push([(w << 6) + h])
+        }
+      }
+    }
+    return serializedGround
+  }
+
+  this.loadSerializedData = function (data) {
+    data.map((e) => {
+      var h = e[0] & 63
+      var w = e[0] >> 6 & 63
+      if (!e[1]) {
+        this.ground.ground[w][h].empty = true
+      } else {
+        this.ground.ground[w][h].empty = false
+        this.ground.ground[w][h].setColor('#' + ('000000' + (e[1]).toString(16)).slice(-6))
+        this.ground.ground[w][h].lines = [
+          e[2] & 1,
+          e[2] >> 1 & 1,
+          e[2] >> 2 & 1,
+          e[2] >> 3 & 1
+        ]
+      }
+    })
+    this.currentPieceGroundDirty = true
+    this.groundDirty = true
+    this.draw()
+  }
+
   this.drawPieceGround = function () {
     this.options.drawablePieces.clear()
     this.currentPieceGround.mapGroundBlocks(function (x, y, block) {
