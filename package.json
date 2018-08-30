@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "parcel-bundler": "^1.9.7",
+    "peerjs": "^0.3.16",
     "roughjs": "^2.2.5",
     "standard": "^11.0.1"
   }
