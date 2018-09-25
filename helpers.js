@@ -34,7 +34,11 @@ function range (start, end, step) {
       for (i = 0; i < start; i++) { range.push(i) }
       break
     case 2:
-      for (i = start; i < end; i++) { range.push(i) }
+      if (end > start) {
+        for (i = start; i < end; i++) { range.push(i) }
+      } else {
+        for (i = start; i > end; i--) { range.push(i) }
+      }
       break
     case 3:
       if (start < end && step > 0) {
@@ -207,6 +211,18 @@ function changeColorLuminance (hex, lum) {
   return rgb
 }
 
+function randomHexColor () {
+  var rgb = '#'
+  var c
+  var i
+  for (i = 0; i < 3; i++) {
+    c = Math.random() * 256
+    c = Math.round(Math.min(Math.max(0, c), 255)).toString(16)
+    rgb += ('00' + c).substr(c.length)
+  }
+  return rgb
+}
+
 function isTouchDevice () {
   return 'ontouchstart' in window || 'onmsgesturechange' in window
 }
@@ -229,5 +245,6 @@ export {
   goFullscreen,
   isTouchDevice,
   changeColorLuminance,
+  randomHexColor,
   getElementSize
 }

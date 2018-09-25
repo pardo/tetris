@@ -7,7 +7,7 @@ function HTMLTetrisGame (parent, options) {
   this.initialize = function () {
     this.options = {
       playable: false,
-      anotherGame: null
+      half: false
     }
     Object.assign(this.options, options)
     this.sendGroundLoopInterval = null
@@ -27,7 +27,13 @@ function HTMLTetrisGame (parent, options) {
   }
 
   this.addReplica = function (conn) {
-    let replica = new HTMLTetrisGame(this.parent, { playable: false })
+    let replica = new HTMLTetrisGame(
+      this.parent,
+      {
+        playable: false,
+        half: true
+      }
+    )
     // someone connected to us
     this.sendGroundLoop(conn)
     conn.on('data', (data) => {
@@ -62,7 +68,11 @@ function HTMLTetrisGame (parent, options) {
 
   this.createHtmlElements = function () {
     let element = document.createElement('div')
-    element.className = 'tetris-container'
+    if (this.options.half) {
+      element.className = 'tetris-container-half'
+    } else {
+      element.className = 'tetris-container'
+    }
     parent.appendChild(element)
     let elementInner = document.createElement('div')
     elementInner.className = 'tetris-container-inner'

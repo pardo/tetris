@@ -11,6 +11,12 @@ function Drawable () {
     this.element.width = size.width
     this.element.height = size.height
   }
+  this.getSize = function () {
+    return {
+      width: this.element.width,
+      height: this.element.height
+    }
+  }
   this.clear = function () {
     this.context2d.clearRect(0, 0, this.element.width, this.element.height)
   }
