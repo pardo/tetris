@@ -5,15 +5,17 @@
   "main": "index.js",
   "scripts": {
     "build": "parcel build -d docs --public-url https://pardo.github.io/tetris/ index.html",
-    "serve": "parcel serve --no-autoinstall index.html"
+    "serve": "parcel serve --no-autoinstall index.html",
+    "ncu": "ncu"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "parcel-bundler": "^1.9.7",
-    "peerjs": "^0.3.16",
+    "npm-check-updates": "^2.15.0",
+    "parcel-bundler": "^1.10.3",
+    "peerjs": "^0.3.18",
     "rainbowvis.js": "^1.0.1",
     "roughjs": "^2.2.5",
-    "standard": "^11.0.1"
+    "standard": "^12.0.1"
   }
 }
