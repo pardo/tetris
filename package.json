@@ -1,21 +1,20 @@
 {
-  "name": "rough_maze",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "tetris",
+  "version": "2.0.0",
+  "description": "Multiplayer rough.js Tetris with serverless P2P (Trystero)",
+  "type": "module",
   "scripts": {
-    "build": "parcel build -d docs --public-url https://pardo.github.io/tetris/ index.html",
-    "serve": "parcel serve --no-autoinstall index.html",
-    "ncu": "ncu"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "npm-check-updates": "^2.15.0",
-    "parcel-bundler": "^1.10.3",
-    "peerjs": "^0.3.18",
-    "rainbowvis.js": "^1.0.1",
-    "roughjs": "^2.2.5",
-    "standard": "^12.0.1"
+    "roughjs": "^4.6.6",
+    "trystero": "^0.21.5"
+  },
+  "devDependencies": {
+    "vite": "^7.1.5"
   }
 }

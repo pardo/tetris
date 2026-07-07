@@ -1,8 +1,11 @@
-import {throttle, getElementSize} from './helpers'
+import { throttle, getElementSize } from './helpers'
 import Tetris from './tetris'
 import Drawable from './drawable'
-import Peer from 'peerjs'
 
+// Renders and drives a single Tetris board inside `parent`.
+// `playable: true`  -> local player: game loops + keyboard/touch input.
+// `playable: false` -> replica: only shows serialized state pushed via
+//                      `game.tetris.loadSerializedData(...)`.
 function HTMLTetrisGame (parent, options) {
   this.initialize = function () {
     this.options = {
@@ -10,8 +13,8 @@ function HTMLTetrisGame (parent, options) {
       half: false
     }
     Object.assign(this.options, options)
-    this.sendGroundLoopInterval = null
     this.parent = parent
+    this.intervals = []
     this.createHtmlElements(parent)
     this.createDrawables()
     this.createTetrisGame()
@@ -21,41 +24,26 @@ function HTMLTetrisGame (parent, options) {
       this.startDrawLoop()
     }
     this.handleResize()
-    setTimeout(() => {
-      this.handleResize()
-    }, 1000)
-  }
-
-  this.addReplica = function (conn) {
-    let replica = new HTMLTetrisGame(
-      this.parent,
-      {
-        playable: false,
-        half: true
-      }
-    )
-    // someone connected to us
-    this.sendGroundLoop(conn)
-    conn.on('data', (data) => {
-      replica.tetris.loadSerializedData(data)
-    })
-    conn.on('close', () => {
-      replica.destroy()
-    })
-    replica.handleResize()
+    // Fonts / layout can settle a beat after first paint; re-measure once.
+    this.intervals.push(setTimeout(() => { this.handleResize() }, 300))
   }
 
   this.destroy = function () {
-    this.parent.removeChild(this.element)
+    this.intervals.forEach((id) => { clearInterval(id); clearTimeout(id) })
+    this.intervals = []
+    window.removeEventListener('resize', this.boundResize)
+    if (this.element && this.element.parentNode) {
+      this.element.parentNode.removeChild(this.element)
+    }
   }
 
   this.attachWindowEvents = function () {
-    window.addEventListener('load', () => { this.handleResize() })
-    window.addEventListener('resize', () => { this.handleResize() })
+    this.boundResize = () => { this.handleResize() }
+    window.addEventListener('resize', this.boundResize)
     if (this.options.playable) {
-      setTimeout(() => { this.createPeer() }, 1000)
-      window.addEventListener('keydown', (e) => { this.handleKeyboardEvent(e) })
-      window.addEventListener('keyup', (e) => { this.handleKeyboardEvent(e) })
+      this.boundKey = (e) => { this.handleKeyboardEvent(e) }
+      window.addEventListener('keydown', this.boundKey)
+      window.addEventListener('keyup', this.boundKey)
     }
   }
 
@@ -67,14 +55,10 @@ function HTMLTetrisGame (parent, options) {
   }
 
   this.createHtmlElements = function () {
-    let element = document.createElement('div')
-    if (this.options.half) {
-      element.className = 'tetris-container-half'
-    } else {
-      element.className = 'tetris-container'
-    }
+    const element = document.createElement('div')
+    element.className = this.options.half ? 'tetris-container-half' : 'tetris-container'
     parent.appendChild(element)
-    let elementInner = document.createElement('div')
+    const elementInner = document.createElement('div')
     elementInner.className = 'tetris-container-inner'
     element.appendChild(elementInner)
     this.element = element
@@ -89,115 +73,73 @@ function HTMLTetrisGame (parent, options) {
   }
 
   this.handleResize = function () {
-    let size = getElementSize(this.element)
+    const size = getElementSize(this.element)
+    if (!size.width || !size.height) { return }
     let blockSize = size.height / this.tetris.options.groundHeight
     if (blockSize * this.tetris.options.groundWidth > size.width) {
-      // blocksize exceed width crop using width
+      // block size would overflow the width, constrain by width instead
       blockSize = size.width / this.tetris.options.groundWidth
     }
-    blockSize = parseInt(blockSize)
-    size = {
+    blockSize = Math.max(1, parseInt(blockSize, 10))
+    const drawSize = {
       width: this.tetris.options.groundWidth * blockSize,
       height: this.tetris.options.groundHeight * blockSize
     }
-    // resize drawables
-    this.background.resize(size)
-    this.pieces.resize(size)
-    // resize game
+    this.background.resize(drawSize)
+    this.pieces.resize(drawSize)
     this.tetris.resize(blockSize)
+    this.tetris.draw()
   }
 
+  // Throttled movement so key-repeat / held touch buttons stay smooth.
   this.moveDown = throttle(function () { this.tetris.pieceMoveDown() }.bind(this), 40)
   this.moveLeft = throttle(function () { this.tetris.pieceMoveLeft() }.bind(this), 100)
   this.moveRight = throttle(function () { this.tetris.pieceMoveRight() }.bind(this), 100)
 
+  // Public input API — used by both keyboard handler and touch controls.
+  this.input = {
+    left: () => this.moveLeft(),
+    right: () => this.moveRight(),
+    down: () => this.moveDown(),
+    rotate: () => this.tetris.rotatePieceCounterClockwise(),
+    reset: () => this.tetris.reset()
+  }
+
   this.handleKeyboardEvent = function (event) {
     switch (event.which) {
-      case 80:
-        // P
-        if (event.type === 'keyup') {}
+      case 37: // left
+        if (event.type === 'keydown') { this.input.left() }
         break
-      case 37:
-        // left
-        if (event.type === 'keydown') {
-          this.moveLeft()
-        }
+      case 38: // up -> rotate
+        if (event.type === 'keyup') { this.input.rotate() }
         break
-      case 38:
-        // up
-        if (event.type === 'keyup') {
-          this.tetris.rotatePieceCounterClockwise()
-        }
+      case 39: // right
+        if (event.type === 'keydown') { this.input.right() }
         break
-      case 39:
-        // right
-        if (event.type === 'keydown') {
-          this.moveRight()
-        }
+      case 40: // down
+        this.input.down()
         break
-      case 82:
-        // R
-        this.tetris.reset()
+      case 32: // space -> rotate
+        if (event.type === 'keyup') { this.input.rotate() }
         break
-      case 40:
-        // down
-        this.moveDown()
-        break
-      case 32:
-        // space
-        if (event.type === 'keyup') {
-          this.tetris.rotatePieceCounterClockwise()
-        }
-        break
-      case 78:
-        // n
-        if (event.type === 'keyup') {
-          let name = window.prompt('I the other name')
-          this.connect(name)
-        }
-        break
-      default:
-        console.log('which', event.which)
+      case 82: // R -> reset
+        if (event.type === 'keyup') { this.input.reset() }
         break
     }
   }.bind(this)
 
-  // networking
-  this.sendGroundLoop = function (conn) {
-    clearInterval(this.sendGroundLoopInterval)
-    this.sendGroundLoopInterval = setInterval(() => {
-      conn.send(
-        this.tetris.serialize()
-      )
-    }, 1000)
-  }
-
-  this.connect = function (anotherName) {
-    let conn = this.peer.connect('zIKosj1p' + anotherName)
-    conn.on('open', () => {
-      this.addReplica(conn)
-    })
-  }
-
   this.startPieceMoveDownLoop = function () {
-    setInterval(() => {
+    this.intervals.push(setInterval(() => {
       this.tetris.pieceMoveDown({ auto: true })
-    }, 800)
+    }, 800))
   }
 
   this.startDrawLoop = function () {
-    setInterval(() => {
+    this.intervals.push(setInterval(() => {
       this.tetris.draw()
-    }, 30) // 40fps
+    }, 30)) // ~33fps
   }
 
-  this.createPeer = function () {
-    this.name = window.prompt('I need your name')
-    this.peer = new Peer('zIKosj1p' + this.name)
-    this.peer.on('connection', (conn) => {
-      this.addReplica(conn)
-    })
-  }
   this.initialize()
 }
 
